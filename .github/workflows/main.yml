@@ -1,4 +1,4 @@
-name: Branch Protection Check
+name: Branch Must Be Up To Date Check
 on:
   pull_request:
     branches: [main]  # adjust to your protected branch
