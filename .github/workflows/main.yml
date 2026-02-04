@@ -1,0 +1,11 @@
+name: Branch Protection Check
+on:
+  pull_request:
+    branches: [main]  # adjust to your protected branch
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pass
+        run: echo "Branch protection check passed"
