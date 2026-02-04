@@ -15,11 +15,12 @@ import java.net.URL;
      * - repo owner username, repo name:repository identifiers.
      * - sha: commit hash to update.
      * - state: status state ("success", "failure", "error", or "pending").
-     * - targetUrl: URL where users can see full build logs (e.g., "http://server-ip/build/1").
+     * - targetUrl: URL where users can see full build logs.
      * - description: short description of the result (e.g., "Build passed").
      * - (Implicit): System Environment Variable "GITHUB_TOKEN" for authentication.
      * * Returns: true if the status was successfully created (HTTP 201), false otherwise (even for invalid data input).
      */
+
 public class SendStatus {
     public static boolean sendingStatus(String owner, String repo, String sha, String state, String targetUrl, String description) throws URISyntaxException {
 
