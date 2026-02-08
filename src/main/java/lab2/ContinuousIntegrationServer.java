@@ -9,6 +9,10 @@ import java.io.IOException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 //importing the SendStatus class
 import lab2.SendStatus;
@@ -23,11 +27,36 @@ public class ContinuousIntegrationServer extends AbstractHandler
     String owner = "";
     String repo = "";
     String sha = "";
-    String state = "";
-    String targetUrl = "";
-    String description = "";
+    String state = "failure"; // TODO: for testing purposes
+    String targetUrl = "example.com";
+    String description = "example description";
+    String cloneUrl = "";
 
-    public static void getData(){
+    public void getData(HttpServletRequest request){
+
+        // Read the entire request body
+        StringBuilder payload = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                payload.append(line).append("\n");
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error reading request body: " + e.getMessage());
+            return;
+        }
+
+        String payloadString = payload.toString();
+        // Parse JSON
+        JsonObject json = JsonParser.parseString(payloadString).getAsJsonObject();
+
+        JsonObject repository = json.getAsJsonObject("repository");
+        owner = repository.getAsJsonObject("owner").get("login").getAsString();
+        repo = repository.get("name").getAsString();
+        sha = json.get("head_commit").getAsJsonObject().get("id").getAsString();
+        cloneUrl = json.get("clone_url").getAsString(); //TODO: to be used in the cloner class
+
 
     }
     public void handle(String target,
@@ -36,12 +65,13 @@ public class ContinuousIntegrationServer extends AbstractHandler
                        HttpServletResponse response) 
         throws IOException, ServletException
     {
+
+
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
-        System.out.println(target);
-
+        getData(request);
 
         // here you do all the continuous integration tasks:
         // 1st clone your repository
@@ -49,9 +79,18 @@ public class ContinuousIntegrationServer extends AbstractHandler
         // 3rd run the tests
         // 4th send the status to the GitHub API
         // 5th save to the build history
-        
-        //SendStatus.sendingStatus(); // String owner, String repo, String sha, String state, String targetUrl, String description
 
+        //TODO:SET targetUrl to the url of the build history
+        //TODO:SET description to the description of the build result
+        //TODO:SET state to the state of the build result
+        
+        try {
+            SendStatus.sendingStatus(owner, repo, sha, state, targetUrl, description);
+        } catch (java.net.URISyntaxException e) {
+            System.err.println("Error sending status: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
 
 
 
@@ -62,9 +101,11 @@ public class ContinuousIntegrationServer extends AbstractHandler
     // used to start the CI server in command line
     public static void main(String[] args) throws Exception
     {
+        System.out.println("Starting CI server on port 8080...");
         Server server = new Server(8080);
         server.setHandler(new ContinuousIntegrationServer()); 
         server.start();
+        System.out.println("CI server started successfully! Listening on http://localhost:8080");
         server.join();
     }
 }

@@ -9,6 +9,7 @@ To build and run this project, you will need:
 
 * **Java:** Version 8
 * **Maven:** Version 3.9.12
+* **ngrok:** Version 3.36.0
 
 **OBS!** Newer version may also work, but this project has been specifically built and tested with the mentioned versions.
 
