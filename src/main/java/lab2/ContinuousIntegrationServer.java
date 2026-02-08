@@ -10,12 +10,26 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+//importing the SendStatus class
+import lab2.SendStatus;
+
 /** 
  Skeleton of a ContinuousIntegrationServer which acts as webhook
  See the Jetty documentation for API documentation of those classes.
 */
 public class ContinuousIntegrationServer extends AbstractHandler
 {
+    //declare class variables
+    String owner = "";
+    String repo = "";
+    String sha = "";
+    String state = "";
+    String targetUrl = "";
+    String description = "";
+
+    public static void getData(){
+
+    }
     public void handle(String target,
                        Request baseRequest,
                        HttpServletRequest request,
@@ -28,10 +42,19 @@ public class ContinuousIntegrationServer extends AbstractHandler
 
         System.out.println(target);
 
-        // here you do all the continuous integration tasks
-        // for example
+
+        // here you do all the continuous integration tasks:
         // 1st clone your repository
         // 2nd compile the code
+        // 3rd run the tests
+        // 4th send the status to the GitHub API
+        // 5th save to the build history
+        
+        //SendStatus.sendingStatus(); // String owner, String repo, String sha, String state, String targetUrl, String description
+
+
+
+
 
         response.getWriter().println("CI job done");
     }
