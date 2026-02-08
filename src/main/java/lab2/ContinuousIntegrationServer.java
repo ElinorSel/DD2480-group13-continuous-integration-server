@@ -27,17 +27,18 @@ public class ContinuousIntegrationServer extends AbstractHandler
     String owner = "";
     String repo = "";
     String sha = "";
-    String state = "failure"; // TODO: for testing purposes
-    String targetUrl = "http://example.com"; // Must be a valid URL (http:// or https://)
-    String description = "example description";
+    String state = "pending"; // TODO: for testing purposes
+    String targetUrl = "http://example.com";
+    String description = "this is a test description";
     String cloneUrl = "";
 
-    public void getData(HttpServletRequest request){
-        // Check if this is a POST request (webhooks are POST)
+    /** returns the payload from the request as a string */
+    public String payloadToString(HttpServletRequest request){
         if (!"POST".equals(request.getMethod())) {
             System.out.println("Not a POST request, skipping JSON parsing");
-            return;
+            return "";
         }
+
         // Read the entire request body
         StringBuilder payload = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
@@ -48,21 +49,23 @@ public class ContinuousIntegrationServer extends AbstractHandler
         }
         catch (Exception e) {
             System.err.println("Error reading request body: " + e.getMessage());
-            return;
+            return "";
         }
-
         String payloadString = payload.toString().trim();
-        //check if the payload is empty
-        if (payloadString.isEmpty()) {
-            System.out.println("No payload received");
-            return;
-        }
 
         // Debug: print first 500 characters of payload
-        System.out.println("Payload preview: " + payloadString.substring(0, Math.min(500, payloadString.length())));
-        // Parse JSON
-        
+        System.out.println("Payload preview: " + payloadString.substring(0, Math.min(50000, payloadString.length())));
+        return payloadString;
+
+    }
+
+    /** parses the JSON string and extracts the owner, repo, sha, and clone url from the payload */
+    public void parseJSON(String payloadString){
         try{
+            if (payloadString.isEmpty()) {
+                System.out.println("No payload received");
+                return;
+            }
             JsonObject json = JsonParser.parseString(payloadString).getAsJsonObject();
             JsonObject repository = json.getAsJsonObject("repository");
             if (repository == null) {
@@ -88,10 +91,9 @@ public class ContinuousIntegrationServer extends AbstractHandler
         }
          catch (Exception e) {
             System.err.println("Error parsing JSON: " + e.getMessage());
-            System.err.println("Payload was: " + payloadString.substring(0, Math.min(500, payloadString.length())));
+            System.err.println("Payload was: " + payloadString.substring(0, Math.min(10000, payloadString.length())));
             e.printStackTrace();
         }
-
 
     }
     public void handle(String target,
@@ -101,36 +103,41 @@ public class ContinuousIntegrationServer extends AbstractHandler
         throws IOException, ServletException
     {
 
-
+        //0. set the response type and status
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
-        getData(request);
+        // 1. parse the webhook payload
+        String payloadString = payloadToString(request);
+        parseJSON(payloadString);
+        //TODO:
+        // SET targetUrl to the url of the build history
+        //SET description to the description of the build result
+        //SET state to the state of the build result
 
-        // here you do all the continuous integration tasks:
-        // 1st clone your repository
-        // 2nd compile the code
+        // 2. clone your repository and compile the code
+        //TODO: to be implemented, unsure what it will return. return the code? so we can send to project tester?
+        //ProjectBuilder.compile(cloneUrl); 
+
         // 3rd run the tests
-        // 4th send the status to the GitHub API
-        // 5th save to the build history
+        //ProjectTester.test()
 
-        //TODO:SET targetUrl to the url of the build history
-        //TODO:SET description to the description of the build result
-        //TODO:SET state to the state of the build result
-        
+
+
+        // 4th send the status to the GitHub API
         try {
             SendStatus.sendingStatus(owner, repo, sha, state, targetUrl, description);
         } catch (java.net.URISyntaxException e) {
             System.err.println("Error sending status: " + e.getMessage());
             e.printStackTrace();
         }
-        
 
+        // 5th save to the build history
+        //TODO: to be implemented, unsure what it will need, build result and some basic info like date etc
+        //HistoryHandler.saveBuild(owner, repo, sha, state, targetUrl, description, buildResult);
 
-
-
-        response.getWriter().println("CI job done");
+        response.getWriter().println("CI job done"); //shown in the browser
     }
  
     // used to start the CI server in command line
