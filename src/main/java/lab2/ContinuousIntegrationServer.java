@@ -28,12 +28,16 @@ public class ContinuousIntegrationServer extends AbstractHandler
     String repo = "";
     String sha = "";
     String state = "failure"; // TODO: for testing purposes
-    String targetUrl = "example.com";
+    String targetUrl = "http://example.com"; // Must be a valid URL (http:// or https://)
     String description = "example description";
     String cloneUrl = "";
 
     public void getData(HttpServletRequest request){
-
+        // Check if this is a POST request (webhooks are POST)
+        if (!"POST".equals(request.getMethod())) {
+            System.out.println("Not a POST request, skipping JSON parsing");
+            return;
+        }
         // Read the entire request body
         StringBuilder payload = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
@@ -47,15 +51,46 @@ public class ContinuousIntegrationServer extends AbstractHandler
             return;
         }
 
-        String payloadString = payload.toString();
-        // Parse JSON
-        JsonObject json = JsonParser.parseString(payloadString).getAsJsonObject();
+        String payloadString = payload.toString().trim();
+        //check if the payload is empty
+        if (payloadString.isEmpty()) {
+            System.out.println("No payload received");
+            return;
+        }
 
-        JsonObject repository = json.getAsJsonObject("repository");
-        owner = repository.getAsJsonObject("owner").get("login").getAsString();
-        repo = repository.get("name").getAsString();
-        sha = json.get("head_commit").getAsJsonObject().get("id").getAsString();
-        cloneUrl = json.get("clone_url").getAsString(); //TODO: to be used in the cloner class
+        // Debug: print first 500 characters of payload
+        System.out.println("Payload preview: " + payloadString.substring(0, Math.min(500, payloadString.length())));
+        // Parse JSON
+        
+        try{
+            JsonObject json = JsonParser.parseString(payloadString).getAsJsonObject();
+            JsonObject repository = json.getAsJsonObject("repository");
+            if (repository == null) {
+                System.err.println("No 'repository' field in JSON");
+                return;
+            }
+            
+            owner = repository.getAsJsonObject("owner").get("login").getAsString();
+            repo = repository.get("name").getAsString();
+            
+            // Get SHA - try "after" first (for push events), then "head_commit"
+            if (json.has("after") && !json.get("after").getAsString().equals("0000000000000000000000000000000000000000")) {
+                sha = json.get("after").getAsString();
+            } else if (json.has("head_commit") && json.get("head_commit") != null) {
+                sha = json.getAsJsonObject("head_commit").get("id").getAsString();
+            } else {
+                System.err.println("No commit SHA found in payload");
+                return;
+            }
+            
+            cloneUrl = repository.get("clone_url").getAsString(); //TODO: to be used in the cloner class
+            System.out.println("Successfully extracted: owner=" + owner + ", repo=" + repo + ", sha=" + sha);
+        }
+         catch (Exception e) {
+            System.err.println("Error parsing JSON: " + e.getMessage());
+            System.err.println("Payload was: " + payloadString.substring(0, Math.min(500, payloadString.length())));
+            e.printStackTrace();
+        }
 
 
     }
