@@ -41,7 +41,10 @@ public final class ProjectBuilder {
                           .setBranch(branch)
                           .call();
             System.out.println("Repository cloned successfully.");
-            return git.getRepository();
+            if(compileMaven())
+                return git.getRepository();
+            else
+                return null;
         } catch(GitAPIException e) {
             e.printStackTrace();
             return null;
@@ -50,7 +53,6 @@ public final class ProjectBuilder {
                 git.close();
             }
         }
-        
     }
 
     /**
@@ -68,4 +70,22 @@ public final class ProjectBuilder {
         }
     }
 
+    public boolean compileMaven() {
+        String[] command = {"cmd.exe", "/c", "mvn", "compile"};
+        try {
+            System.out.println("Creating Process...");
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.directory(this.localDir);
+            pb.inheritIO();
+            Process process = pb.start();
+            int exitVal = process.waitFor();
+            System.out.println("Maven compile finished with exit code: " + exitVal);
+            return exitVal == 0;
+        }
+        catch (IOException | InterruptedException e) {
+            System.err.println("Compilation failed due to internal error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
