@@ -20,10 +20,21 @@ To build and run this project, you will need:
 ## Test execution
 - how test execution has been implemented and unit-tested.
 ## Notifications
-- how notification has been implemented and unit-tested.
+The notification feature is implemented in the SendStatus class. It serves as the bridge between our CI server and GitHub that provides immediate visual feedback on the build result. We utilized the GitHub REST API (specifically the /statuses/{sha} endpoint) to update the commit status. Instead of using heavy external libraries, the implementation uses Java's native HttpURLConnection to send authenticated POST requests. The system dynamically constructs a JSON payload containing:
+
+The feature is tested in `SendStatusTest.java` using JUnit. We verify that sendingStatus() returns true when provided with valid credentials and a real commit SHA, which confirms the API accepts the request (HTTP 201). We test failure scenarios (e.g., invalid tokens or missing repositories) to ensure the system  handles errors without crashing (returning false and logging the error).
+
+**OBS!** Security is managed via environment variables (GITHUB_TOKEN), ensuring no sensitive tokens are hardcoded.
+
+To run the tests in `SendStatusTest.java` (which you can also confirm by looking at the chosen commit to is tested), enter the following terminal command:
+```
+mvn compile
+mvn test -Dtest=SendStatusTest
+```
+
 ### Project Structure
 
-## dependencies
+## Dependencies
 
 ## Statement of contributions
 
@@ -38,6 +49,10 @@ To build and run this project, you will need:
 **Helin Saeid:**
 
 **Liza Aziz:**
+
+- Developed the SendStatus module (`SendStatus.java`), enabling the CI server to communicate build results back to GitHub via the REST API.
+- Wrote unit tests (`SendStatusTest.java`) to verify API connectivity, token authentication and error handling for the notification system.
+- Responsible for the "Notification" section of `README.md`.
 
 ## Essence standard
 -  Essence standardLinks to an external site. v1.2) by evaluating the checklist on p. 52: In what state are you in? Why? What are obstacles to reach the next state?
