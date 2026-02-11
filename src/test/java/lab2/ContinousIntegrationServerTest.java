@@ -40,11 +40,10 @@ public class ContinousIntegrationServerTest {
      * Input: Empty string.
      * Output: Exception thrown.
      */
-    void testParseJSONEmptyPayload() {
+    void testParseJSONEmptyPayload ()throws Exception{
         ContinuousIntegrationServer server = new ContinuousIntegrationServer();
         payloadString = "";
-        server.parseJSON(payloadString);
-        Exception exception = assertThrows(Exception.class, () -> server.parseJSON(""));
+        Exception exception = assertThrows(Exception.class, () -> server.parseJSON(payloadString));
         assertEquals("No payload received", exception.getMessage());
     }
 }

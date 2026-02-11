@@ -28,9 +28,9 @@ public class ContinuousIntegrationServer extends AbstractHandler
     String owner = "";
     String repo = "";
     String sha = "";
-    String state = "pending"; // TODO: for testing purposes
+    String state = ""; 
     String targetUrl = "http://example.com";
-    String description = "this is a test description";
+    String description = ""; // TODO: set from the build result
     String cloneUrl = "";
     String branch = "";
 
@@ -62,12 +62,14 @@ public class ContinuousIntegrationServer extends AbstractHandler
     }
 
     /** parses the JSON string and extracts the owner, repo, sha, and clone url from the payload */
-    public void parseJSON(String payloadString){
+    public void parseJSON(String payloadString) throws Exception {
+        
+        if (payloadString.isEmpty()) {
+            System.out.println("No payload received");
+            throw new Exception("No payload received");
+        }
+
         try{
-            if (payloadString.isEmpty()) {
-                System.out.println("No payload received");
-                return;
-            }
             JsonObject json = JsonParser.parseString(payloadString).getAsJsonObject();
             String ref = json.get("ref").getAsString();
             if (ref == null) {
@@ -119,17 +121,21 @@ public class ContinuousIntegrationServer extends AbstractHandler
 
         // 1. parse the webhook payload
         String payloadString = payloadToString(request);
-        parseJSON(payloadString);
+        try{
+            parseJSON(payloadString);
+        } catch (Exception e) {
+            System.err.println("Error parsing JSON: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
         //TODO:
         // SET targetUrl to the url of the build history
         //SET description to the description of the build result
-        //SET state to the state of the build result
 
         // 2. clone your repository and compile the code
-
         ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha ); 
 
-        // 3rd run the tests
+        // 3. run the tests
         ProjectTester test = new ProjectTester();
         boolean testResult = test.runTests(build.localDir.getAbsolutePath());
         if (testResult) {
@@ -138,7 +144,7 @@ public class ContinuousIntegrationServer extends AbstractHandler
             state = "failure";
         }
 
-        // 4th send the status to the GitHub API
+        // 4. send the status to the GitHub API
         try {
             SendStatus.sendingStatus(owner, repo, sha, state, targetUrl, description);
         } catch (java.net.URISyntaxException e) {

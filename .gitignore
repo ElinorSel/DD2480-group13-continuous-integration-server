@@ -29,3 +29,6 @@ target/
 .idea/
 .vscode/
 lib/
+
+#temp-builds
+temp-builds/
