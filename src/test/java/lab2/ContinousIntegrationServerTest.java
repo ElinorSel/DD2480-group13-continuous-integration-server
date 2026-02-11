@@ -12,10 +12,7 @@ public class ContinousIntegrationServerTest {
     String realOwner = "FakeOwner";
     String realRepo = "FakeRepo";
     String realSha = "11111111111111111111111111111111111111111";
-
-    // Test payload JSON string
-    String jsonPath = "src/test/java/lab2/payload.json";
-    String payloadString = new String(Files.readAllBytes(Paths.get(jsonPath)), StandardCharsets.UTF_8);
+    String payloadString;
 
     @Test
     /**
@@ -24,6 +21,8 @@ public class ContinousIntegrationServerTest {
      * Output: The owner, repo, sha.
      */
     void testParseJSON() throws Exception {
+        String jsonPath = "src/test/java/lab2/payload.json";
+        payloadString = new String(Files.readAllBytes(Paths.get(jsonPath)), StandardCharsets.UTF_8);
         
         // Create an instance and parse the JSON
         ContinuousIntegrationServer server = new ContinuousIntegrationServer();
@@ -41,7 +40,7 @@ public class ContinousIntegrationServerTest {
      * Input: Empty string.
      * Output: Exception thrown.
      */
-    void testParseJSONWithInvalidInput() {
+    void testParseJSONEmptyPayload() {
         ContinuousIntegrationServer server = new ContinuousIntegrationServer();
         payloadString = "";
         server.parseJSON(payloadString);

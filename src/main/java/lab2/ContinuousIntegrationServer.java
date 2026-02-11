@@ -16,6 +16,7 @@ import com.google.gson.JsonParser;
 
 //importing the SendStatus class
 import lab2.SendStatus;
+//import lab2.ProjectBuilder;
 
 /** 
  Skeleton of a ContinuousIntegrationServer which acts as webhook
@@ -31,6 +32,7 @@ public class ContinuousIntegrationServer extends AbstractHandler
     String targetUrl = "http://example.com";
     String description = "this is a test description";
     String cloneUrl = "";
+    String branch = "";
 
     /** returns the payload from the request as a string */
     public String payloadToString(HttpServletRequest request){
@@ -67,6 +69,12 @@ public class ContinuousIntegrationServer extends AbstractHandler
                 return;
             }
             JsonObject json = JsonParser.parseString(payloadString).getAsJsonObject();
+            String ref = json.get("ref").getAsString();
+            if (ref == null) {
+                System.err.println("No 'ref' field in JSON, no branch name found");
+                return;
+            }
+            branch = ref.substring(ref.lastIndexOf('/') + 1);
             JsonObject repository = json.getAsJsonObject("repository");
             if (repository == null) {
                 System.err.println("No 'repository' field in JSON");
@@ -86,8 +94,9 @@ public class ContinuousIntegrationServer extends AbstractHandler
                 return;
             }
             
-            cloneUrl = repository.get("clone_url").getAsString(); //TODO: to be used in the cloner class
-            System.out.println("Successfully extracted: owner=" + owner + ", repo=" + repo + ", sha=" + sha);
+            cloneUrl = repository.get("clone_url").getAsString();
+            System.out.println("-------------------------------------");
+            System.out.println("Successfully extracted: owner=" + owner + ", repo=" + repo + ", sha=" + sha + ", cloneUrl=" + cloneUrl + ", branch=" + branch);
         }
          catch (Exception e) {
             System.err.println("Error parsing JSON: " + e.getMessage());
@@ -117,8 +126,8 @@ public class ContinuousIntegrationServer extends AbstractHandler
         //SET state to the state of the build result
 
         // 2. clone your repository and compile the code
-        //TODO: to be implemented, unsure what it will return. return the code? so we can send to project tester?
-        //ProjectBuilder.compile(cloneUrl); 
+
+        // ProjectBuilder build = new ProjectBuilder(cloneUrl, "main", sha ); //TODO: find the branch name
 
         // 3rd run the tests
         //ProjectTester.test()
