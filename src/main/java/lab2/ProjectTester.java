@@ -29,11 +29,20 @@ public class ProjectTester {
         File projectDir = new File(projectPath);
         File logFile = new File(projectDir, "mvn_test_output.log");
 
-        // Prepare the command
-        ProcessBuilder pb = new ProcessBuilder("mvn", "test");
+        // Prepare the command - use Windows-compatible invocation on Windows
+        String[] command;
+        String os = System.getProperty("os.name").toLowerCase();
+        
+        if (os.contains("win")) {
+            command = new String[]{"cmd.exe", "/c", "mvn", "test"};
+        } else {
+            command = new String[]{"mvn", "test"};
+        }
+
+        ProcessBuilder pb = new ProcessBuilder(command);
         pb.directory(projectDir);
         pb.redirectOutput(logFile);
-        pb.redirectErrorStream(true); // merge error output with standard output //test
+        pb.redirectErrorStream(true); // merge error output with standard output
 
         try {
             Process process = pb.start();
