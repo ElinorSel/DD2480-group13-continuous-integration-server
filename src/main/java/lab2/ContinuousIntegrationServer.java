@@ -127,12 +127,16 @@ public class ContinuousIntegrationServer extends AbstractHandler
 
         // 2. clone your repository and compile the code
 
-        // ProjectBuilder build = new ProjectBuilder(cloneUrl, "main", sha ); //TODO: find the branch name
+        ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha ); 
 
         // 3rd run the tests
-        //ProjectTester.test()
-
-
+        ProjectTester test = new ProjectTester();
+        boolean testResult = test.runTests(build.localDir.getAbsolutePath());
+        if (testResult) {
+            state = "success";
+        } else {
+            state = "failure";
+        }
 
         // 4th send the status to the GitHub API
         try {
