@@ -25,11 +25,13 @@ import lab2.SendStatus;
 public class ContinuousIntegrationServer extends AbstractHandler
 {
     //declare class variables
+    private final HistoryHandler historyHandler = new HistoryHandler();
+
     String owner = "";
     String repo = "";
     String sha = "";
     String state = ""; 
-    String targetUrl = "http://example.com";
+    String targetUrl = "http://localhost:8080/builds";
     String description = ""; // TODO: set from the build result
     String cloneUrl = "";
     String branch = "";
@@ -119,6 +121,19 @@ public class ContinuousIntegrationServer extends AbstractHandler
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
+        // History List Route
+        if (target.equals("/builds")) {
+            response.getWriter().println(historyHandler.getHistoryListHtml());
+            return;
+        }
+
+        // Build Detail Route
+        if (target.startsWith("/builds/")) {
+            String buildId = target.substring("/builds/".length());
+            response.getWriter().println(historyHandler.getBuildDetailHtml(buildId));
+            return;
+        }
+
         // 1. parse the webhook payload
         String payloadString = payloadToString(request);
         try{
@@ -127,13 +142,11 @@ public class ContinuousIntegrationServer extends AbstractHandler
             System.err.println("Error parsing JSON: " + e.getMessage());
             e.printStackTrace();
         }
-        
-        //TODO:
-        // SET targetUrl to the url of the build history
+
         //SET description to the description of the build result
 
         // 2. clone your repository and compile the code
-        ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha ); 
+        ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha );
 
         // 3. run the tests
         ProjectTester test = new ProjectTester();
@@ -153,8 +166,8 @@ public class ContinuousIntegrationServer extends AbstractHandler
         }
 
         // 5th save to the build history
-        //TODO: to be implemented, unsure what it will need, build result and some basic info like date etc
-        //HistoryHandler.saveBuild(owner, repo, sha, state, targetUrl, description, buildResult);
+        String buildLog = "Commit: " + sha + "\nBranch: " + branch + "\nResult: " + state;
+        historyHandler.saveBuild(sha, buildLog, state);
 
         response.getWriter().println("CI job done"); //shown in the browser
     }
