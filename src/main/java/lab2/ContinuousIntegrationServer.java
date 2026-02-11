@@ -135,14 +135,11 @@ public class ContinuousIntegrationServer extends AbstractHandler
         // 2. clone your repository and compile the code
         ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha ); 
 
-        // 3. run the tests
+        // Run the tests and store report in 'state'
         ProjectTester test = new ProjectTester();
-        boolean testResult = test.runTests(build.localDir.getAbsolutePath());
-        if (testResult) {
-            state = "success";
-        } else {
-            state = "failure";
-        }
+        ProjectTester.TestResults results = test.runTests(build.localDir.getAbsolutePath());
+        System.out.println(results.message); // "All tests passed" or "Failures: ... "
+        state = results.message;
 
         // 4. send the status to the GitHub API
         try {
