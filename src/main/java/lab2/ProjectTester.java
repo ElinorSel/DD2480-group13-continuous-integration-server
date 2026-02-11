@@ -20,8 +20,9 @@ public class ProjectTester {
         File projectDir = new File(projectPath);
         File logFile = new File(projectDir, "test_output.log");
 
-        // Setup ProcessBuilder to run mvn test
-        ProcessBuilder pb = new ProcessBuilder("mvn", "test");
+        // Use cmd.exe on Windows to run mvn test
+        String[] command = {"cmd.exe", "/c", "mvn", "test"};
+        ProcessBuilder pb = new ProcessBuilder(command);
         pb.directory(projectDir);
 
         // Redirect output to a file so we can analyze it later
