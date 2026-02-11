@@ -16,7 +16,7 @@ public class HistoryHandler {
     private static final String HISTORY_DIR = "./builds";
 
     /**
-     * Constructs a HistoryHandler and creates the build directory if it doesn't exist.
+     * Constructs a HistoryHandler and creates the build directory if it doesn't exist
      */
     public HistoryHandler() {
         // Create the directory if it doesn't exist
