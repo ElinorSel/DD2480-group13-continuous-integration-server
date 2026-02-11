@@ -33,7 +33,7 @@ public class ProjectTester {
         ProcessBuilder pb = new ProcessBuilder("mvn", "test");
         pb.directory(projectDir);
         pb.redirectOutput(logFile);
-        pb.redirectErrorStream(true); // merge error output with standard output
+        pb.redirectErrorStream(true); // merge error output with standard output //test
 
         try {
             Process process = pb.start();
