@@ -22,13 +22,21 @@ To build and run this project, you will need:
 ## Notifications
 - how notification has been implemented and unit-tested.
 
-## Build History (P7)
+## Build History
+The build history feature is implemented in the `HistoryHandler` class. It persists all CI build results to disk so they survive server restarts. Each build is saved as a text file in the `./builds/` directory with a unique timestamp-based ID, storing the commit SHA, build date, status, and full build logs.
 
-The CI server keeps a persistent history of all builds, surviving server restarts. Builds are stored as files in the `./builds/` directory and include commit SHA, build date, status, and logs.
 
 ### URLs
 - **List all builds:** `http://localhost:8080/builds`
 - **View specific build:** `http://localhost:8080/builds/{buildId}`
+
+The feature is tested in `HistoryHandlerTest.java` using JUnit. We verify that builds are correctly saved to disk, that the detail page displays the correct information, that the history list contains clickable links, and that missing builds return an appropriate error message.
+
+To run the tests in `HistoryHandlerTest.java`, enter the following terminal command:
+```
+mvn compile
+mvn test -Dtest=HistoryHandlerTest
+```
 
 ### Project Structure
 
@@ -41,8 +49,9 @@ The CI server keeps a persistent history of all builds, surviving server restart
 **Elinor Selinder:**
 
 **Omar Almassri:**
-Implemented P7 (Build History) 
-- created `HistoryHandler` class for persistent build storage and retrieval, added `/builds` routes, and wrote unit tests.
+- Developed the Build History module (`HistoryHandler.java`), enabling the CI server to persist and retrieve build results from disk.
+- Wrote unit tests (`HistoryHandlerTest.java`) to verify file persistence, HTML generation, and error handling for the history system.
+- Responsible for the "Build History" section of `README.md`.
 
 **Hannes Westerberg:**
 
