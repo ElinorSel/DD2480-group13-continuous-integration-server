@@ -20,7 +20,7 @@ public final class ProjectBuilder {
 
 
     public ProjectBuilder(String repoUrl, String branch, String ID) {
-        File cloneDirectoryPath = new File("./" + ID);
+        File cloneDirectoryPath = new File("./temp-builds/" + ID);
         if(cloneDirectoryPath.exists()){
             deleteClone(cloneDirectoryPath);
         }

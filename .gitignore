@@ -30,3 +30,6 @@ target/
 .vscode/
 lib/
 builds/
+
+#temp-builds
+temp-builds/

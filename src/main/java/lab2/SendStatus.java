@@ -57,7 +57,7 @@ public class SendStatus {
 
         // HTTP response 201 = successful
         if (responseCode == 201) {
-            System.out.println("Status sent successfully: " + state);
+            System.out.println("The following status was sent to the GitHub API: " + state);
             return true;
         }  
         else {
