@@ -120,27 +120,9 @@ public class ContinuousIntegrationServer extends AbstractHandler
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
-        // 1. parse the webhook payload
-        String payloadString = payloadToString(request);
-        try{
-            parseJSON(payloadString);
-        } catch (Exception e) {
-            System.err.println("Error parsing JSON: " + e.getMessage());
-            e.printStackTrace();
-        }
         
-        //TODO:
-        // SET targetUrl to the url of the build history
-        //SET description to the description of the build result
+    
 
-        // 2. clone your repository and compile the code
-        ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha ); 
-
-        // Run the tests and store report in 'state'
-        ProjectTester test = new ProjectTester();
-        ProjectTester.TestResults results = test.runTests(build.localDir.getAbsolutePath());
-        System.out.println(results.message); // "All tests passed" or "Failures: ... "
-        state = results.message;
         // Handle history routes first - return early to avoid any webhook/CI logic
         if (target.equals("/builds")) {
             response.getWriter().println(historyHandler.getHistoryListHtml());
@@ -171,14 +153,11 @@ public class ContinuousIntegrationServer extends AbstractHandler
             // 2. clone your repository and compile the code
             ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha );
 
-            // 3. run the tests
+            // 3. Run the tests and store report in 'state'
             ProjectTester test = new ProjectTester();
-            boolean testResult = test.runTests(build.localDir.getAbsolutePath());
-            if (testResult) {
-                state = "success";
-            } else {
-                state = "failure";
-            }
+            ProjectTester.TestResults results = test.runTests(build.localDir.getAbsolutePath());
+            System.out.println(results.message); // "All tests passed" or "Failures: ... "
+            state = results.message;
 
             // 4. send the status to the GitHub API
             try {
