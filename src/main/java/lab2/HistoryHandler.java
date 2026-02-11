@@ -16,7 +16,7 @@ public class HistoryHandler {
     private static final String HISTORY_DIR = "./builds";
 
     /**
-     * Constructs a HistoryHandler and creates the build directory if it doesn't exist
+     * Constructs a HistoryHandler and creates the build directory if it doesn't exist.
      */
     public HistoryHandler() {
         // Create the directory if it doesn't exist
@@ -31,7 +31,7 @@ public class HistoryHandler {
      * @return The Build ID (timestamp), or null if save failed
      */
     public String saveBuild(String commitSha, String log, String status) {
-        String buildId = commitSha;
+        String buildId = String.valueOf(System.currentTimeMillis());
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
         File file = new File(HISTORY_DIR, buildId + ".txt");
