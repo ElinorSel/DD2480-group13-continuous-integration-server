@@ -18,7 +18,11 @@ public final class ProjectBuilder {
      * branch = branch where change has been made
      */
 
-
+    /**
+     * Method that creates a path and firstly checks if there already exists the same path, which is in that case deleted. 
+     * Then it calls on the repo cloner method and also sets the attribute for the class to the cloned repository and its directory path. 
+     * Parameters: link to the repository, branch and ID for the path
+     */
     public ProjectBuilder(String repoUrl, String branch, String ID) {
         File cloneDirectoryPath = new File("./temp-builds/" + ID);
         if(cloneDirectoryPath.exists()){
@@ -31,6 +35,11 @@ public final class ProjectBuilder {
         this.localDir = cloneDirectoryPath;   
     }
 
+    /**
+     * Method that clones a repository to the path that was specified in the previous method.
+     * If cloning is successful we then try to compile it, and finally return the repo if compiling also was successful. 
+     * Parameters: link to the repository, branch and the directory path that was created
+     */
     private Repository cloneRepo(String repoUrl, String branch, File cloneDirectoryPath){
         Git git = null;
         try {
@@ -57,6 +66,7 @@ public final class ProjectBuilder {
 
     /**
      * Method to delete the clone of the repository
+     * Parameters: The directory path of the repository
      */
     public void deleteClone(File directory) {
         if(directory != null && directory.exists()){
@@ -70,22 +80,33 @@ public final class ProjectBuilder {
         }
     }
 
+    /**
+     * Method that runs a maven compile command on the cloned repository.
+     * Returns true if exit code is 0 (success), false otherwise
+     */
     public boolean compileMaven() {
-        String[] command = {"cmd.exe", "/c", "mvn", "compile"};
-        try {
-            System.out.println("Creating Process...");
-            ProcessBuilder pb = new ProcessBuilder(command);
-            pb.directory(this.localDir);
-            pb.inheritIO();
-            Process process = pb.start();
-            int exitVal = process.waitFor();
-            System.out.println("Maven compile finished with exit code: " + exitVal);
-            return exitVal == 0;
+        String[] command;
+        String os = System.getProperty("os.name").toLowerCase();
+        
+        if (os.contains("win")) {
+        command = new String[]{"cmd.exe", "/c", "mvn", "compile"};
+        } else {
+        command = new String[]{"mvn", "compile"};
         }
-        catch (IOException | InterruptedException e) {
-            System.err.println("Compilation failed due to internal error: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
+            try {
+                System.out.println("Creating Process...");
+                ProcessBuilder pb = new ProcessBuilder(command);
+                pb.directory(this.localDir);
+                pb.inheritIO();
+                Process process = pb.start();
+                int exitVal = process.waitFor();
+                System.out.println("Maven compile finished with exit code: " + exitVal);
+                return exitVal == 0;
+            }
+            catch (IOException | InterruptedException e) {
+                System.err.println("Compilation failed due to internal error: " + e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
     }
 }
