@@ -16,6 +16,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 */
 public class ContinuousIntegrationServer extends AbstractHandler
 {
+    private final HistoryHandler historyHandler = new HistoryHandler();
+
     public void handle(String target,
                        Request baseRequest,
                        HttpServletRequest request,
@@ -27,6 +29,21 @@ public class ContinuousIntegrationServer extends AbstractHandler
         baseRequest.setHandled(true);
 
         System.out.println(target);
+
+        // History List Route
+        if (target.equals("/builds")) {
+            response.getWriter().println(historyHandler.getHistoryListHtml());
+            return;
+        }
+
+        // Build Detail Route
+        if (target.startsWith("/builds/")) {
+            String buildId = target.substring("/builds/".length());
+            response.getWriter().println(historyHandler.getBuildDetailHtml(buildId));
+            return;
+        }
+
+
 
         // here you do all the continuous integration tasks
         // for example
