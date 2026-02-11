@@ -21,6 +21,15 @@ To build and run this project, you will need:
 - how test execution has been implemented and unit-tested.
 ## Notifications
 - how notification has been implemented and unit-tested.
+
+## Build History (P7)
+
+The CI server keeps a persistent history of all builds, surviving server restarts. Builds are stored as files in the `./builds/` directory and include commit SHA, build date, status, and logs.
+
+### URLs
+- **List all builds:** `http://localhost:8080/builds`
+- **View specific build:** `http://localhost:8080/builds/{buildId}`
+
 ### Project Structure
 
 ## dependencies
@@ -32,6 +41,8 @@ To build and run this project, you will need:
 **Elinor Selinder:**
 
 **Omar Almassri:**
+Implemented P7 (Build History) 
+- created `HistoryHandler` class for persistent build storage and retrieval, added `/builds` routes, and wrote unit tests.
 
 **Hannes Westerberg:**
 
