@@ -16,7 +16,9 @@ To build and run this project, you will need:
 
 
 ## Compilation
-- how compilation has been implemented and unit-tested.
+The compilation is implemented in the ProjectBuilder class. This class is also used to clone the repository which is implemented using JGit. If the cloning was successful the repository will be compiled which is done using the ProjectBuilder class. Finally if both processes are succesful the cloning method will return the repository. 
+
+The unit test sends a repository from Github into the class which is cloned and compiled. We check that the cloning was done successfully by checking that the branch of the clone is equal to the branch that was sent into the method. 
 ## Test execution
 - how test execution has been implemented and unit-tested.
 ## Notifications
@@ -35,7 +37,7 @@ mvn test -Dtest=SendStatusTest
 ### Project Structure
 
 ## Dependencies
-
+This project uses Maven for dependency management. All dependencies are defined in `pom.xml`.
 ## Statement of contributions
 
 ### Member Contributions
@@ -47,6 +49,8 @@ mvn test -Dtest=SendStatusTest
 **Hannes Westerberg:**
 
 **Helin Saeid:**
+- Developed the ProjectBuilder class which clones and compiles a repository. 
+- Wrote a unit test to test the ProjectBuilder class with a test repository. 
 
 **Liza Aziz:**
 

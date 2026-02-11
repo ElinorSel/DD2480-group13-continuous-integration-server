@@ -7,7 +7,11 @@ import org.junit.jupiter.api.Test;
 
 
 public class RepoCloneTest {
-
+    /**
+     * Contract: The function must return true if the cloned branch is the same as the input branch.
+     * Input: Repostory url, branch, and ID
+     * Output: True
+     */
     @Test void cloneRepoTest(){
         ProjectBuilder repoBuilder = new ProjectBuilder("https://github.com/helinsaeid/TestRepo", "refs/heads/testBranch", "cloneTest");
         Repository newRepo = repoBuilder.repo;
