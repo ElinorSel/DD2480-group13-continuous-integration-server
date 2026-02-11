@@ -115,61 +115,68 @@ public class ContinuousIntegrationServer extends AbstractHandler
                        HttpServletResponse response) 
         throws IOException, ServletException
     {
-
-        //0. set the response type and status
+        // Set response headers
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
-        // History List Route
+        // Handle history routes first - return early to avoid any webhook/CI logic
         if (target.equals("/builds")) {
             response.getWriter().println(historyHandler.getHistoryListHtml());
             return;
         }
 
-        // Build Detail Route
         if (target.startsWith("/builds/")) {
             String buildId = target.substring("/builds/".length());
             response.getWriter().println(historyHandler.getBuildDetailHtml(buildId));
             return;
         }
 
-        // 1. parse the webhook payload
-        String payloadString = payloadToString(request);
-        try{
-            parseJSON(payloadString);
-        } catch (Exception e) {
-            System.err.println("Error parsing JSON: " + e.getMessage());
-            e.printStackTrace();
+        // Only process webhook/CI logic for POST requests
+        if ("POST".equals(request.getMethod())) {
+            // 1. parse the webhook payload
+            String payloadString = payloadToString(request);
+            try {
+                parseJSON(payloadString);
+            } catch (Exception e) {
+                System.err.println("Error parsing JSON: " + e.getMessage());
+                e.printStackTrace();
+                response.getWriter().println("Error: Failed to parse payload");
+                return;
+            }
+
+            //SET description to the description of the build result
+
+            // 2. clone your repository and compile the code
+            ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha );
+
+            // 3. run the tests
+            ProjectTester test = new ProjectTester();
+            boolean testResult = test.runTests(build.localDir.getAbsolutePath());
+            if (testResult) {
+                state = "success";
+            } else {
+                state = "failure";
+            }
+
+            // 4. send the status to the GitHub API
+            try {
+                SendStatus.sendingStatus(owner, repo, sha, state, targetUrl, description);
+            } catch (java.net.URISyntaxException e) {
+                System.err.println("Error sending status: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            // 5th save to the build history
+            String buildLog = "Commit: " + sha + "\nBranch: " + branch + "\nResult: " + state;
+            historyHandler.saveBuild(sha, buildLog, state);
+
+            response.getWriter().println("CI job done"); //shown in the browser
+            return;
         }
 
-        //SET description to the description of the build result
-
-        // 2. clone your repository and compile the code
-        ProjectBuilder build = new ProjectBuilder(cloneUrl, branch, sha );
-
-        // 3. run the tests
-        ProjectTester test = new ProjectTester();
-        boolean testResult = test.runTests(build.localDir.getAbsolutePath());
-        if (testResult) {
-            state = "success";
-        } else {
-            state = "failure";
-        }
-
-        // 4. send the status to the GitHub API
-        try {
-            SendStatus.sendingStatus(owner, repo, sha, state, targetUrl, description);
-        } catch (java.net.URISyntaxException e) {
-            System.err.println("Error sending status: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        // 5th save to the build history
-        String buildLog = "Commit: " + sha + "\nBranch: " + branch + "\nResult: " + state;
-        historyHandler.saveBuild(sha, buildLog, state);
-
-        response.getWriter().println("CI job done"); //shown in the browser
+        // Default response for non-POST, non-builds routes
+        response.getWriter().println("CI server is running. Send POST requests for webhook processing.");
     }
  
     // used to start the CI server in command line

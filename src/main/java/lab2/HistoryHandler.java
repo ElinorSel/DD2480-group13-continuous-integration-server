@@ -31,7 +31,7 @@ public class HistoryHandler {
      * @return The Build ID (timestamp), or null if save failed
      */
     public String saveBuild(String commitSha, String log, String status) {
-        String buildId = String.valueOf(System.currentTimeMillis());
+        String buildId = commitSha;
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
         File file = new File(HISTORY_DIR, buildId + ".txt");
