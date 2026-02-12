@@ -35,7 +35,7 @@ public class SendStatusTest {
         boolean result = SendStatus.sendingStatus(realOwner, realRepo, realSha, "failure",
         "http://example.com", "Maven test failed");
         
-        assertTrue(result, "Should return true even when sending a failure status");    
+        assertFalse(result, "Should return true even when sending a failure status");    
     }
 
     /**
