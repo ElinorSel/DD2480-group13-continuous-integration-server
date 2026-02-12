@@ -89,4 +89,22 @@ public class ProjectTesterTest {
         assertTrue(results.failedTests.isEmpty(), "Should be empty if no tests actually ran");
         assertTrue(results.message.contains("Compilation or other error"), "Should give a generic error message");
     }
+
+    /**
+     * Very trivial test case for the runTests method, to ensure it handles a bad path.
+     */
+    @Test
+    public void testRunTests_InvalidDirectory() {
+        ProjectTester tester = new ProjectTester();
+
+        // Run with a path that definitely doesn't exist
+        ProjectTester.TestResults results = tester.runTests("path/that/does/not/exist");
+
+        // Assert that it handled the error
+        assertFalse(results.success, "Should return false for invalid directory");
+
+        // Verify it caught the exception
+        assertTrue(results.message.startsWith("System Error"),
+                "Message should indicate a system error (IOException)");
+    }
 }
