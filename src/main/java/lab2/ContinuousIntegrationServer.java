@@ -206,7 +206,7 @@ public class ContinuousIntegrationServer extends AbstractHandler
             }
 
             // 5th save to the build history
-            String buildLog = "Commit: " + sha + "\nBranch: " + branch + "\nResult: " + state;
+            String buildLog = "Commit: " + sha + "\nBranch: " + branch + "\nResult: " + state + "\nFull build log:\n" + results.logs;
             historyHandler.saveBuild(sha, buildLog, state);
 
             response.getWriter().println("CI job done"); //shown in the browser
