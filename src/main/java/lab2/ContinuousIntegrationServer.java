@@ -32,7 +32,7 @@ public class ContinuousIntegrationServer extends AbstractHandler
     String sha = "";
     String state = ""; 
     String targetUrl = "http://localhost:8080/builds";
-    String description = ""; // TODO: set from the build result
+    String description = "";
     String cloneUrl = "";
     String branch = "";
 
@@ -65,7 +65,7 @@ public class ContinuousIntegrationServer extends AbstractHandler
         }
         String payloadString = payload.toString().trim();
 
-        // Debug: print first 500 characters of payload
+        // Debug: print payload
         System.out.println("Payload preview: " + payloadString.substring(0, Math.min(50000, payloadString.length())));
         return payloadString;
 
