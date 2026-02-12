@@ -14,7 +14,8 @@ To build and run this project, you will need:
 **OBS!** Newer version may also work, but this project has been specifically built and tested with the mentioned versions.
 
 ### Executing program
-
+run: ngrok http 8080
+in a new terminal run: mvn exec:java
 
 ## Compilation
 The compilation is implemented in the ProjectBuilder class. This class is also used to clone the repository which is implemented using JGit. If the cloning was successful the repository will be compiled which is done using the ProjectBuilder class. Finally if both processes are succesful the cloning method will return the repository. 
