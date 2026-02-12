@@ -8,6 +8,13 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
+/**
+ * Manages the compilation and build process.
+ * <p>
+ * This class is responsible for cloning the Git repository from a specific URL
+ * and branch, and then triggering the Maven build process.
+ * </p>
+ */
 public final class ProjectBuilder {
 
     public final Repository repo;
