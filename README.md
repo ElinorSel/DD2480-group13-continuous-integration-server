@@ -41,6 +41,9 @@ mvn test -Dtest=SendStatusTest
 ## Build History
 The build history feature is implemented in the `HistoryHandler` class. It persists all CI build results to disk so they survive server restarts. Each build is saved as a text file in the `./builds/` directory with a unique timestamp-based ID, storing the commit SHA, build date, status, and full build logs.
 
+## API Documentation
+
+Generated Javadoc is available in `target/site/apidocs/`. To regenerate, run `mvn javadoc:javadoc` and open `target/site/apidocs/index.html` in a browser.
 
 ### URLs
 - **List all builds:** `http://localhost:8080/builds`
