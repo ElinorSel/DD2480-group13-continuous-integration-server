@@ -15,11 +15,13 @@ public class ProjectTester {
         public final boolean success;
         public final String message; // Either "All tests passed" or "Failed: ..."
         public final List<String> failedTests; // The list of failed test names
+        public final String logs;
 
-        public TestResults(boolean success, String message, List<String> failedTests) {
+        public TestResults(boolean success, String message, List<String> failedTests, String logs) {
             this.success = success;
             this.message = message;
             this.failedTests = failedTests;
+            this.logs = logs;
         }
     }
     /**
@@ -51,7 +53,7 @@ public class ProjectTester {
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace(); // Simple error handling
-            return new TestResults(false, "System Error: " + e.getMessage(), new ArrayList<>());
+            return new TestResults(false, "System Error: " + e.getMessage(), new ArrayList<>(), "");
         }
     }
 
@@ -62,6 +64,8 @@ public class ProjectTester {
         List<String> failedTestNames = new ArrayList<>();
         boolean buildSuccess = false;
 
+        StringBuilder logBuilder = new StringBuilder();
+
         // Regex patterns for success and failure
         Pattern successPattern = Pattern.compile("BUILD SUCCESS");
         Pattern failurePattern = Pattern.compile("\\[ERROR\\]\\s+([\\w]+)\\.([\\w]+):");
@@ -69,6 +73,9 @@ public class ProjectTester {
         try (BufferedReader br = new BufferedReader(new FileReader(logFile))) {
             String line;
             while ((line = br.readLine()) != null) {
+
+                logBuilder.append(line).append("\n");
+
                 // Check success
                 if (successPattern.matcher(line).find()) {
                     buildSuccess = true;
@@ -85,13 +92,15 @@ public class ProjectTester {
             return new TestResults(false, "Log read error", failedTestNames);
         }
 
+        String fullLog = logBuilder.toString();
+
         // Determine Final Status
         if (exitCode == 0 || buildSuccess) {
-            return new TestResults(true, "All tests passed", failedTestNames);
+            return new TestResults(true, "All tests passed", failedTestNames, fullLog);
         }
         if (!failedTestNames.isEmpty()) {
             String msg = "Tests failed: " + String.join(", ", failedTestNames);
-            return new TestResults(false, msg, failedTestNames);
+            return new TestResults(false, msg, failedTestNames, fullLog);
         }
 
         return new TestResults(false, "Build failed (Compilation or other error)", failedTestNames);
