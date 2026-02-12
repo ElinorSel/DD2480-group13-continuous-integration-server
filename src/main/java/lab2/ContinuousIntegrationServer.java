@@ -48,7 +48,7 @@ public class ContinuousIntegrationServer extends AbstractHandler
     public String payloadToString(HttpServletRequest request){
         if (!"POST".equals(request.getMethod())) {
             System.out.println("Not a POST request, skipping JSON parsing");
-            return "";
+            return "NOT A POST REQUEST";
         }
 
         // Read the entire request body
@@ -211,6 +211,9 @@ public class ContinuousIntegrationServer extends AbstractHandler
 
             response.getWriter().println("CI job done"); //shown in the browser
             return;
+        }
+        else{
+            System.err.println("Not a POST request");
         }
 
         // Default response for non-POST, non-builds routes
