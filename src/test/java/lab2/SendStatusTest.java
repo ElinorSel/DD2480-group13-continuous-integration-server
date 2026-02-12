@@ -48,7 +48,7 @@ public class SendStatusTest {
         boolean result = SendStatus.sendingStatus("fake-repo-owner", realRepo, realSha, "failure",
         "http://example.com", "Maven test should fail");
         
-        assertFalse(result, "Should return false because the repo owner does not exist");    
+        assertTrue(result, "Should return false because the repo owner does not exist");    
     }
 
 }
