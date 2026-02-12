@@ -14,14 +14,13 @@ public final class ProjectBuilder {
     public final File localDir;
 
     /**
-     * repoURL = url of repository we wish to clone
-     * branch = branch where change has been made
-     */
-
-    /**
-     * Method that creates a path and firstly checks if there already exists the same path, which is in that case deleted. 
+     * Creates a path and firstly checks if there already exists a clone on the path, which is in that case deleted. 
      * Then it calls on the repo cloner method and also sets the attribute for the class to the cloned repository and its directory path. 
-     * Parameters: link to the repository, branch and ID for the path
+     * @param repoUrl link to the repository
+     * @param branch branch that we want to clone
+     * @param ID ID for path and history
+     * @return the cloned repository
+     * @throws RuntimeException if clone operation fails
      */
     public ProjectBuilder(String repoUrl, String branch, String ID) {
         File cloneDirectoryPath = new File("./temp-builds/" + ID);
@@ -35,11 +34,6 @@ public final class ProjectBuilder {
         this.localDir = cloneDirectoryPath;   
     }
 
-    /**
-     * Method that clones a repository to the path that was specified in the previous method.
-     * If cloning is successful we then try to compile it, and finally return the repo if compiling also was successful. 
-     * Parameters: link to the repository, branch and the directory path that was created
-     */
     private Repository cloneRepo(String repoUrl, String branch, File cloneDirectoryPath){
         Git git = null;
         try {
@@ -65,8 +59,9 @@ public final class ProjectBuilder {
     }
 
     /**
-     * Method to delete the clone of the repository
-     * Parameters: The directory path of the repository
+     * Deletes the clone of the repository.
+     * @param directory The directory path of the repository
+     * @throws IOException if error occurs while deleting
      */
     public void deleteClone(File directory) {
         if(directory != null && directory.exists()){
@@ -81,8 +76,10 @@ public final class ProjectBuilder {
     }
 
     /**
-     * Method that runs a maven compile command on the cloned repository.
-     * Returns true if exit code is 0 (success), false otherwise
+     * Runs a maven compile command on the cloned repository.
+     * @return true if exit code is 0 (success), false otherwise
+     * @throws IOException if error occurs while reading source files or writing output
+     * @throws InterruptedException if the compilation process is interrupted
      */
     public boolean compileMaven() {
         String[] command;
@@ -109,4 +106,5 @@ public final class ProjectBuilder {
                 return false;
             }
     }
+
 }
