@@ -89,7 +89,7 @@ public class ProjectTester {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return new TestResults(false, "Log read error", failedTestNames);
+            return new TestResults(false, "Log read error", failedTestNames, "");
         }
 
         String fullLog = logBuilder.toString();
@@ -103,6 +103,6 @@ public class ProjectTester {
             return new TestResults(false, msg, failedTestNames, fullLog);
         }
 
-        return new TestResults(false, "Build failed (Compilation or other error)", failedTestNames);
+        return new TestResults(false, "Build failed (Compilation or other error)", failedTestNames, "");
     }
 }
