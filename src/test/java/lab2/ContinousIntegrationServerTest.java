@@ -4,8 +4,19 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Request;
+
+import static org.mockito.Mockito.*;
 
 public class ContinousIntegrationServerTest {
 
@@ -45,5 +56,37 @@ public class ContinousIntegrationServerTest {
         payloadString = "";
         Exception exception = assertThrows(Exception.class, () -> server.parseJSON(payloadString));
         assertEquals("No payload received", exception.getMessage());
+    }
+
+    @Test
+    /**
+     * Contract: For non-POST requests, payloadToString should skip parsing and return an explanatory string.
+     * Input: A mocked HttpServletRequest with method = "GET".
+     * Output: "NOT A POST REQUEST".
+     */
+    void testPayloadToStringNonPostReturnsMessage() {
+        ContinuousIntegrationServer server = new ContinuousIntegrationServer();
+
+        // Arrange: mock a non-POST request
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("GET");
+
+        String result = server.payloadToString(request);
+
+        assertEquals("NOT A POST REQUEST", result);
+    }
+    
+    @Test
+    /**
+     * Contract: The function should throw a NullPointerException if the request is null.
+     * Input: Null request.
+     * Output: NullPointerException thrown.
+     */
+    void testHandleWithNullRequestThrows() {
+        ContinuousIntegrationServer server = new ContinuousIntegrationServer();
+
+        assertThrows(NullPointerException.class, () -> 
+            server.handle("/", null, null, null)
+        );
     }
 }
