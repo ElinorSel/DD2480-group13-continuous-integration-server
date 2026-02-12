@@ -21,7 +21,9 @@ The compilation is implemented in the ProjectBuilder class. This class is also u
 
 The unit test sends a repository from Github into the class which is cloned and compiled. We check that the cloning was done successfully by checking that the branch of the clone is equal to the branch that was sent into the method. 
 ## Test execution
-- how test execution has been implemented and unit-tested.
+Test execution is implemented in the ProjectTester class by wrapping the 'mvn test' command with Java's ProcessBuilder. The console output is redirected to a log file and parsed using Regex to detect build success or failure. The method returns a TestResults object containing the overall status and a list of specific failed tests, if any. 
+
+We unit tested ProjectTester using dummy log files containing hardcoded output scenarios (successful build, compilation error, specific test failures). We then point the parser method at these files to verify it correctly identifies the status and extracts the names of failed tests.
 ## Notifications
 The notification feature is implemented in the SendStatus class. It serves as the bridge between our CI server and GitHub that provides immediate visual feedback on the build result. We utilized the GitHub REST API (specifically the /statuses/{sha} endpoint) to update the commit status. Instead of using heavy external libraries, our implementation uses HttpURLConnection to send authenticated POST requests. 
 
@@ -66,6 +68,8 @@ This project uses Maven for dependency management. All dependencies are defined 
 - Responsible for the "Build History" section of `README.md`.
 
 **Hannes Westerberg:**
+- Developed the ProjectTester class, automating the maven tests and creating a status report to send to GitHub.
+- Wrote unit tests for the ProjectTester class.
 
 **Helin Saeid:**
 - Developed the ProjectBuilder class which clones and compiles a repository. 
