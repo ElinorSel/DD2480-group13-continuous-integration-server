@@ -79,8 +79,6 @@ mvn compile
 mvn test -Dtest=HistoryHandlerTest
 ```
 
-### Project Structure
-
 ## Dependencies
 
 This project uses Maven for dependency management. All dependencies are defined in `pom.xml`.
