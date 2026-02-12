@@ -6,7 +6,7 @@ A minimal continuous integration (CI) server. The project implements core CI fea
 
 ## Prerequisites
 
-To build and run this project, you will need:
+To build and run this project, you will need: test
 
 - **Java:** Version 8
 - **Maven:** Version 3.9.12
