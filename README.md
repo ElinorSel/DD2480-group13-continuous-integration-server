@@ -79,6 +79,10 @@ mvn compile
 mvn test -Dtest=HistoryHandlerTest
 ```
 
+## API Documentation
+
+Generated Javadoc is available in `target/site/apidocs/`. To regenerate, run `mvn javadoc:javadoc` and open `target/site/apidocs/index.html` in a browser.
+
 ## Dependencies
 
 This project uses Maven for dependency management. All dependencies are defined in `pom.xml`.
