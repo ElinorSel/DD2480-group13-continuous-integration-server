@@ -8,20 +8,31 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
-     * GitHub Commit Status Updater.
-     * Sends a POST request to the GitHub REST API to update the status (success/failure/pending/error) 
-     * of a specific commit SHA. This allows the CI server to report build results directly to the repo.
-     * * Inputs: 
-     * - repo owner username, repo name:repository identifiers.
-     * - sha: commit hash to update.
-     * - state: status state ("success", "failure", "error", or "pending").
-     * - targetUrl: URL where users can see full build logs.
-     * - description: short description of the result (e.g., "Build passed").
-     * - (Implicit): System Environment Variable "GITHUB_TOKEN" for authentication.
-     * * Returns: true if the status was successfully created (HTTP 201), false otherwise (even for invalid data input).
-     */
-
+ * GitHub Commit Status Updater.
+ * <p>
+ * This class is responsible for sending POST requests to the GitHub REST API to update 
+ * the status of a specific commit. It allows the CI server to report build results 
+ * (success, failure, pending, or error) directly to the repository interface.
+ * </p>
+ */
 public class SendStatus {
+    
+    /**
+     * Sends a status update to a specific commit on GitHub.
+     * <p>
+     * This method constructs a JSON payload and sends it via HTTP POST.
+     * It requires the system environment variable <code>GITHUB_TOKEN</code> to be set for authentication.
+     * </p>
+     *
+     * @param owner       The username of the repository owner (e.g., "Group13").
+     * @param repo        The name of the repository.
+     * @param sha         The specific commit hash (SHA) to update.
+     * @param state       The status state: "success", "failure", "error", or "pending".
+     * @param targetUrl   The URL where users can view the full build logs.
+     * @param description A short description of the result (e.g., "Build passed").
+     * @return            true if the status was successfully created (HTTP 201), false otherwise.
+     * @throws URISyntaxException If the constructed URL for the API endpoint is invalid.
+     */
     public static boolean sendingStatus(String owner, String repo, String sha, String state, String targetUrl, String description) throws URISyntaxException {
 
     // URL (destination) which JSON string (message) will be sent to
