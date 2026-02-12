@@ -19,7 +19,6 @@ public final class ProjectBuilder {
      * @param repoUrl link to the repository
      * @param branch branch that we want to clone
      * @param ID ID for path and history
-     * @return the cloned repository
      * @throws RuntimeException if clone operation fails
      */
     public ProjectBuilder(String repoUrl, String branch, String ID) {
@@ -61,7 +60,6 @@ public final class ProjectBuilder {
     /**
      * Deletes the clone of the repository.
      * @param directory The directory path of the repository
-     * @throws IOException if error occurs while deleting
      */
     public void deleteClone(File directory) {
         if(directory != null && directory.exists()){
@@ -78,8 +76,6 @@ public final class ProjectBuilder {
     /**
      * Runs a maven compile command on the cloned repository.
      * @return true if exit code is 0 (success), false otherwise
-     * @throws IOException if error occurs while reading source files or writing output
-     * @throws InterruptedException if the compilation process is interrupted
      */
     public boolean compileMaven() {
         String[] command;
